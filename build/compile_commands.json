@@ -1,0 +1,27 @@
+[
+{
+  "directory": "/home/mgold/school/n_puzzle/build",
+  "command": "/usr/bin/c++   -g -Wall -Wextra -Wpedantic -Wno-implicit-fallthrough -std=gnu++20 -o CMakeFiles/test.dir/Grid.cpp.o -c /home/mgold/school/n_puzzle/source/Grid.cpp",
+  "file": "/home/mgold/school/n_puzzle/source/Grid.cpp"
+},
+{
+  "directory": "/home/mgold/school/n_puzzle/build",
+  "command": "/usr/bin/c++   -g -Wall -Wextra -Wpedantic -Wno-implicit-fallthrough -std=gnu++20 -o CMakeFiles/test.dir/coords.cpp.o -c /home/mgold/school/n_puzzle/source/coords.cpp",
+  "file": "/home/mgold/school/n_puzzle/source/coords.cpp"
+},
+{
+  "directory": "/home/mgold/school/n_puzzle/build",
+  "command": "/usr/bin/c++   -g -Wall -Wextra -Wpedantic -Wno-implicit-fallthrough -std=gnu++20 -o CMakeFiles/test.dir/SnailFill.cpp.o -c /home/mgold/school/n_puzzle/source/SnailFill.cpp",
+  "file": "/home/mgold/school/n_puzzle/source/SnailFill.cpp"
+},
+{
+  "directory": "/home/mgold/school/n_puzzle/build",
+  "command": "/usr/bin/c++   -g -Wall -Wextra -Wpedantic -Wno-implicit-fallthrough -std=gnu++20 -o CMakeFiles/test.dir/NPuzzle.cpp.o -c /home/mgold/school/n_puzzle/source/NPuzzle.cpp",
+  "file": "/home/mgold/school/n_puzzle/source/NPuzzle.cpp"
+},
+{
+  "directory": "/home/mgold/school/n_puzzle/build",
+  "command": "/usr/bin/c++   -g -Wall -Wextra -Wpedantic -Wno-implicit-fallthrough -std=gnu++20 -o CMakeFiles/test.dir/test.cpp.o -c /home/mgold/school/n_puzzle/source/test.cpp",
+  "file": "/home/mgold/school/n_puzzle/source/test.cpp"
+}
+]
