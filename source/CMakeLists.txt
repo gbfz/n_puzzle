@@ -7,8 +7,9 @@ add_compile_options(-g -Wall -Wextra -Wpedantic -Wno-implicit-fallthrough)
 
 add_executable(test
 	Grid.cpp
-	coords.cpp
+	Coords.cpp
 	SnailFill.cpp
 	NPuzzle.cpp
+	Node.cpp
 	test.cpp
 )

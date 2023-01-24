@@ -46,8 +46,7 @@ void SnailFill::init_coords(const int side) {
 
 Grid SnailFill::get_goal_state(const Grid& g) {
 	init_coords(g.side);
-	Grid goal;
-	goal.side = g.side;
+	Grid goal{g};
 	for (ft::coords tile{0, 0}; int val : get_puzzle_values(g)) {
 		goal[tile] = val;
 		tile = next(tile);

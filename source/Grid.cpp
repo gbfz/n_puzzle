@@ -1,47 +1,84 @@
-#include "coords.hpp"
 #include "Grid.hpp"
+#include <initializer_list>
 #include <algorithm>
-#include <bits/ranges_util.h>
 #include <cmath>
+#include <utility>
 #include <iostream>
 
 namespace ft {
 
-Grid::Grid(std::initializer_list<std::pair<coords, int>> vals)
-	: side(std::sqrt(vals.size() + 1.0))
+Grid::Grid(std::initializer_list<grid_t::value_type> vals)
+	: grid(std::move(vals))
+	, side(std::sqrt(vals.size() + 1)) {}
+
+int Grid::at(coords tile) const
 {
-	for(auto&& pair : vals) {
-		grid.emplace(std::move(pair));
+	return grid.at(tile);
+}
+
+int& Grid::operator[](coords tile) noexcept
+{
+	return grid[tile];
+}
+
+auto Grid::neighbor(coords tile, Change dir) noexcept -> iter_t
+{
+	using enum Change;
+	switch (dir)
+	{
+		case Up:    tile.y -= 1; break;
+		case Down:  tile.y += 1; break;
+		case Left:  tile.x -= 1; break;
+		case Right: tile.x += 1; break;
 	}
+	return grid.find(tile);
 }
 
-Grid::Grid(const Grid& other)
-	: grid(other.grid)
-	, side(other.side) {
+auto Grid::neighbors_of_empty() -> std::vector<iter_t>
+{
+	auto [empty_tile, _] = *this->find_by_value(0);
+	std::vector<iter_t> neighbors;
+
+	if (auto right = neighbor(empty_tile, Change::Right); right != grid.end()) {
+		neighbors.emplace_back(std::move(right));
+	}
+	if (auto down = neighbor(empty_tile, Change::Down); down != grid.end()) {
+		neighbors.emplace_back(std::move(down));
+	}
+	if (auto left = neighbor(empty_tile, Change::Left); left != grid.end()) {
+		neighbors.emplace_back(std::move(left));
+	}
+	if (auto up = neighbor(empty_tile, Change::Up); up != grid.end()) {
+		neighbors.emplace_back(std::move(up));
+	}
+	return neighbors;
 }
 
-Grid::Grid(Grid&& other) { *this = std::move(other); }
-
-Grid& Grid::operator= (const Grid& other) {
-	if (this == &other)
-		return *this;
-	grid = other.grid;
-	side = other.side;
-	return *this;
+auto Grid::find_by_coords(coords tile) noexcept -> iter_t
+{
+	return grid.find(tile);
 }
 
-Grid& Grid::operator= (Grid&& other) {
-	if (this == &other)
-		return *this;
-	grid = std::move(other.grid);
-	side = std::exchange(other.side, 0);
-	return *this;
+auto Grid::find_by_coords(coords tile) const noexcept -> const_iter_t
+{
+	return grid.find(tile);
 }
 
-int Grid::at(const ft::coords& tile) const { return grid.at(tile); }
-int& Grid::operator[](const ft::coords& tile) { return grid[tile]; }
+auto Grid::find_by_value(int val) noexcept -> iter_t
+{
+	return std::ranges::find_if(grid, [val](const auto& p) {
+			return p.second == val;
+	});
+}
 
-void Grid::print() const noexcept {
+auto Grid::find_by_value(int val) const noexcept -> const_iter_t
+{
+	return std::ranges::find_if(grid, [val](const auto& p) {
+			return p.second == val;
+	});
+}
+
+void Grid::print() const {
 	std::cout << " x";
 	// TODO: select number of spaces according to grid size
 	for (auto i = 0; i < this->side; ++i) {
@@ -51,83 +88,30 @@ void Grid::print() const noexcept {
 	for (auto i = 0; i < this->side; ++i) {
 		std::cout << " . ";
 		for (auto j = 0; j < this->side; ++j) {
-			if (grid.contains({j, i}))
-				std::cout << grid.at({j, i}) << ' ';
+			if (grid.contains({j, i})) {
+				if (grid.at({j, i}) == 0) {
+					std::cout << "\033[1;31m";
+					std::cout << grid.at({j, i});
+					std::cout << "\033[0m ";
+				} else std::cout << grid.at({j, i}) << ' ';
+			}
 			else std::cout << "  ";
 		}
 		std::cout << '\n';
 	}
 }
 
-auto Grid::get_neighbor(const ft::coords& tile, Change dir) noexcept
-	-> decltype(grid)::iterator
+auto Grid::swap_empty_with(int val) noexcept -> void
 {
-	auto x = tile.x;
-	auto y = tile.y;
-	switch (dir) {
-		case Change::Up:    y -= 1; break;
-		case Change::Down:  y += 1; break;
-		case Change::Left:  x -= 1; break;
-		case Change::Right: x += 1; break;
-	}
-	return grid.find({x, y});
-}
-
-auto Grid::get_neighbors_of_empty()
-	-> std::vector<decltype(grid)::iterator>
-{
-	auto [empty_tile, _] = *find(0);
-	std::vector<decltype(grid)::iterator> neighbors;
-	if (auto&& up = get_neighbor(empty_tile, Change::Up); up != grid.end()) {
-		neighbors.emplace_back(up);
-	}
-	if (auto&& right = get_neighbor(empty_tile, Change::Right); right != grid.end()) {
-		neighbors.emplace_back(right);
-	}
-	if (auto&& down = get_neighbor(empty_tile, Change::Down); down != grid.end()) {
-		neighbors.emplace_back(down);
-	}
-	if (auto&& left = get_neighbor(empty_tile, Change::Left); left != grid.end()) {
-		neighbors.emplace_back(left);
-	}
-	return neighbors;
-}
-
-auto Grid::find(const ft::coords& c) noexcept
-	-> decltype(grid)::iterator
-{ return grid.find(c); }
-
-auto Grid::find(const ft::coords& c) const noexcept
-	-> decltype(grid)::const_iterator
-{ return grid.find(c); }
-
-auto Grid::find(int val) noexcept
-	-> decltype(grid)::iterator
-{
-	return std::ranges::find_if(grid, [val](const auto& p) { return p.second == val; });
-}
-
-auto Grid::find(int val) const noexcept
-	-> decltype(grid)::const_iterator
-{
-	return std::ranges::find_if(grid, [val](const auto& p) { return p.second == val; });
-}
-
-std::ostream& operator<< (std::ostream& os, Change c) {
-	using enum Change;
-	switch (c) {
-		case Up:    return os << "Up";
-		case Right: return os << "Right";
-		case Down:  return os << "Down";
-		case Left:  return os << "Left";
-	}
-	return os;
+	auto empty_it = find_by_value(0);
+	auto swap_it  = find_by_value(val);
+	std::swap(empty_it, swap_it);
 }
 
 }
 
 namespace std {
-	void swap(ft::Grid::value_type& lhs, ft::Grid::value_type& rhs) noexcept {
-		std::swap(lhs.second, rhs.second);
+	void swap(ft::Grid::iter_t a, ft::Grid::iter_t b) {
+		std::swap(a->second, b->second);
 	}
 }

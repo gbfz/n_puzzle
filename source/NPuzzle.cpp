@@ -1,28 +1,34 @@
 #include "NPuzzle.hpp"
-#include <utility>
+#include "SnailFill.hpp"
 
 namespace ft {
 
-NPuzzle::NPuzzle(const Grid& g)
-	: initial(g)
-	, side(initial.side) {
-		goal.side = side;
-}
+NPuzzle::NPuzzle(const Grid& grid, std::unique_ptr<IHeuristic> heuristic)
+	: initial(grid)
+	, goal(SnailFill{}.get_goal_state(initial))
+	, side(grid.side)
+	, heuristic(std::move(heuristic)) { }
 
-NPuzzle::NPuzzle(Grid&& g)
-	: initial(std::forward<Grid>(g))
-	, side(initial.side) {
-		goal.side = side;
-}
-
-auto NPuzzle::get_next_states(Grid& g) -> std::vector<Grid> {
-	std::vector<Grid> next_states;
-	for (auto neighbor : g.get_neighbors_of_empty()) {
-		auto next = Grid(g);
-		std::iter_swap(next.find(0), next.find(neighbor->second));
-		next_states.emplace_back(std::move(next));
+std::vector<Nodeptr> NPuzzle::next_states(Nodeptr node) const
+{
+	std::vector<Nodeptr> states;
+	for (auto tile : node->grid.neighbors_of_empty())
+	{
+		Grid next = node->grid;
+		next.swap_empty_with(tile->second);
+		auto new_state = make_node(
+				std::move(next),
+				node->g_score + 1,
+				node->g_score + 1 + heuristic->h_score(next, goal),
+				node);
+		states.emplace_back(std::move(new_state));
 	}
-	return next_states;
+	return states;
+}
+
+int NPuzzle::h_score(Nodeptr node) const
+{
+	return heuristic->h_score(node->grid, goal);
 }
 
 }

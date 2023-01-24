@@ -1,8 +1,11 @@
 #pragma once
-#include "coords.hpp"
+
+#include "Coords.hpp"
+
+#include <initializer_list>
 #include <unordered_map>
 #include <vector>
-#include <initializer_list>
+#include <memory>
 
 namespace ft {
 
@@ -13,42 +16,37 @@ enum class Change {
 	Left
 };
 
-std::ostream& operator<< (std::ostream& os, Change c);
+struct Grid
+{
+	using grid_t = std::unordered_map<ft::coords, int, hash_coords>;
+	using iter_t = grid_t::iterator;
+	using const_iter_t = grid_t::const_iterator;
 
-struct Grid {
-	std::unordered_map<coords, int, ft::hash_coords> grid;
-	int side;
+	grid_t grid;
+	const int side;
 
-	using value_type = decltype(grid)::value_type;
+	Grid(std::initializer_list<grid_t::value_type> vals);
 
-	Grid(std::initializer_list<std::pair<coords, int>> vals);
-	Grid(const Grid& other);
-	Grid(Grid&& other);
-	Grid& operator= (const Grid& other);
-	Grid& operator= (Grid&& other);
-	Grid() = default;
+	bool operator== (const Grid& other) const = default;
+	int at(coords tile) const;
+	int& operator[](coords tile) noexcept;
 
-	auto begin() { return grid.begin(); }
-	auto begin() const { return grid.begin(); }
-	auto end() { return grid.end(); }
-	auto end() const { return grid.end(); }
+	auto neighbor(coords tile, Change dir) noexcept -> iter_t;
+	auto neighbors_of_empty() -> std::vector<iter_t>;
 
-	int at(const ft::coords& tile) const;
-	int& operator[](const ft::coords& tile);
+	auto find_by_coords(coords tile) noexcept -> iter_t;
+	auto find_by_coords(coords tile) const noexcept -> const_iter_t;
 
-	void print() const noexcept;
+	auto find_by_value(int val) noexcept -> iter_t;
+	auto find_by_value(int val) const noexcept -> const_iter_t;
 
-	auto get_neighbor(const ft::coords& tile, Change dir) noexcept -> decltype(grid)::iterator;
-	auto get_neighbors_of_empty() -> std::vector<decltype(grid)::iterator>;
+	auto swap_empty_with(int val) noexcept -> void;
 
-	auto find(const ft::coords& c) noexcept -> decltype(grid)::iterator;
-	auto find(const ft::coords& c) const noexcept -> decltype(grid)::const_iterator;
-	auto find(int val) noexcept -> decltype(grid)::iterator;
-	auto find(int val) const noexcept -> decltype(grid)::const_iterator;
+	void print() const;
 };
 
 }
 
 namespace std {
-	void swap(ft::Grid::value_type& lhs, ft::Grid::value_type& rhs) noexcept;
+	void swap(ft::Grid::iter_t a, ft::Grid::iter_t b);
 }

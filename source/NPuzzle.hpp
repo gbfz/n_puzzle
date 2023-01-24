@@ -1,13 +1,6 @@
 #pragma once
-#include "Grid.hpp"
-#include <iostream>
-#include <memory>
-#include <algorithm>
-#include <ranges>
-#include <tuple>
-#include <functional>
-
-#include "SnailFill.hpp"
+#include "Node.hpp"
+#include "IHeuristic.hpp"
 
 namespace ft {
 
@@ -15,12 +8,12 @@ struct NPuzzle {
 	Grid initial;
 	Grid goal;
 	const int side;
+	std::unique_ptr<IHeuristic> heuristic;
 
-	NPuzzle(Grid&& grid);
-	NPuzzle(const Grid& grid);
+	NPuzzle(const Grid& grid, std::unique_ptr<IHeuristic> heuristic);
 
-	auto get_next_states(Grid& g) -> std::vector<Grid>;
-
+	std::vector<Nodeptr> next_states(Nodeptr node) const;
+	int h_score(Nodeptr node) const;
 };
 
 }
