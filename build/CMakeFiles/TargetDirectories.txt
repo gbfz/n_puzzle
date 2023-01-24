@@ -1,3 +1,0 @@
-/home/mgold/school/n_puzzle/build/CMakeFiles/test.dir
-/home/mgold/school/n_puzzle/build/CMakeFiles/edit_cache.dir
-/home/mgold/school/n_puzzle/build/CMakeFiles/rebuild_cache.dir
