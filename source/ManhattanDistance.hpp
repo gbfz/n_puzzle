@@ -1,9 +1,6 @@
 #pragma once
 #include "IHeuristic.hpp"
 
-#include <iostream>
-#include <unistd.h>
-
 namespace ft {
 
 struct ManhattanDistance : virtual IHeuristic {
@@ -36,7 +33,6 @@ struct ManhattanDistance : virtual IHeuristic {
 	virtual int h_score(ft::coords fst, ft::coords snd) noexcept override
 	{
 		using std::abs;
-		// std::cout << fst << " | " << snd << '\n';
 		return abs(fst.x - snd.x) + abs(fst.y - snd.y);
 	}
 

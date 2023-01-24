@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <utility>
+#include <iomanip>
 #include <iostream>
 
 namespace ft {
@@ -78,24 +79,36 @@ auto Grid::find_by_value(int val) const noexcept -> const_iter_t
 	});
 }
 
-void Grid::print() const {
+int Grid::get_print_width() const
+{
+	int longest_num = std::ranges::max_element(grid)->second;
+	int num_digits = longest_num > 9 ? std::log10(longest_num) + 1 : 1;
+	return num_digits + 1;
+}
+
+void Grid::print() const
+{
+	const int len = get_print_width();
 	std::cout << " x";
-	// TODO: select number of spaces according to grid size
-	for (auto i = 0; i < this->side; ++i) {
-		std::cout << " .";
+	for (auto i = 0; i < side; ++i) {
+		std::cout << std::setw(len + 1) << " . ";
 	}
 	std::cout << '\n';
-	for (auto i = 0; i < this->side; ++i) {
-		std::cout << " . ";
-		for (auto j = 0; j < this->side; ++j) {
-			if (grid.contains({j, i})) {
-				if (grid.at({j, i}) == 0) {
-					std::cout << "\033[1;31m";
-					std::cout << grid.at({j, i});
-					std::cout << "\033[0m ";
-				} else std::cout << grid.at({j, i}) << ' ';
+	for (auto i = 0; i < side; ++i)
+	{
+		std::cout << " .";
+		for (auto j = 0; j < side; ++j) {
+			if (grid.contains({j, i}))
+			{
+				auto val = grid.at({j, i});
+				if (val == 0) {
+					std::cout << "\033[1;31m" // red
+						      << std::setw(len) << val
+							  << "\033[0m "; // reset
+				} else {
+					std::cout << std::setw(len) << val << ' ';
+				}
 			}
-			else std::cout << "  ";
 		}
 		std::cout << '\n';
 	}
@@ -103,9 +116,9 @@ void Grid::print() const {
 
 auto Grid::swap_empty_with(int val) noexcept -> void
 {
-	auto empty_it = find_by_value(0);
-	auto swap_it  = find_by_value(val);
-	std::swap(empty_it, swap_it);
+	auto empty_tile = find_by_value(0);
+	auto swap_tile  = find_by_value(val);
+	std::swap(empty_tile->second, swap_tile->second);
 }
 
 }

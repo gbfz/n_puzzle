@@ -43,6 +43,8 @@ struct Grid
 	auto swap_empty_with(int val) noexcept -> void;
 
 	void print() const;
+
+	int get_print_width() const;
 };
 
 }

@@ -1,17 +1,15 @@
 #include "NPuzzle.hpp"
 #include "ManhattanDistance.hpp"
 
-#include <limits>
-#include <list>
 #include <queue>
-#include <optional>
-#include <iostream>
-#include <algorithm>
-#include <set>
 #include <unordered_set>
+#include <algorithm>
+
+#include <optional>
 #include <string>
 #include <tuple>
-#include <unordered_map>
+
+#include <iostream>
 
 using namespace ft;
 
@@ -44,9 +42,11 @@ std::optional<Nodeptr> AStar(NPuzzle& puzzle, size_t& open_max, size_t& memory_m
 		if (state->grid == puzzle.goal)
 			return state;
 		frontier.pop();
-		for (auto next : puzzle.next_states(state)) {
+		for (auto next : puzzle.next_states(state))
+		{
 			auto new_cost = state->g_score + 1;
-			if (!closed_set.contains(next) || new_cost < next->g_score) {
+			if (!closed_set.contains(next) || new_cost < next->g_score)
+			{
 				next->f_score = new_cost + puzzle.h_score(next);
 				frontier.emplace(next);
 			}
@@ -58,15 +58,19 @@ std::optional<Nodeptr> AStar(NPuzzle& puzzle, size_t& open_max, size_t& memory_m
 std::pair<std::optional<Nodeptr>, int> dfs_contour(Nodeptr node, int f_limit, const NPuzzle& puzzle, size_t& steps)
 {
 	steps += 1;
-	if (node->grid == puzzle.goal)
+	if (node->grid == puzzle.goal) {
 		return {node, f_limit};
-	if (node->f_score > f_limit)
+	}
+	if (node->f_score > f_limit) {
 		return {{}, node->f_score};
-	auto next_f = std::numeric_limits<int>::max();
-	for (auto next : puzzle.next_states(node)) {
+	}
+	auto next_f = INT_MAX;
+	for (auto next : puzzle.next_states(node))
+	{
 		auto [result, new_f] = dfs_contour(next, f_limit, puzzle, steps);
-		if (result)
+		if (result) {
 			return {result, f_limit};
+		}
 		next_f = std::min(next_f, new_f);
 	}
 	return {{}, next_f};
@@ -87,14 +91,16 @@ Nodeptr IDAStar(NPuzzle& puzzle, size_t& steps)
 std::vector<Grid> trace_path(Nodeptr goal)
 {
 	std::vector<Grid> path;
-	while (goal != nullptr) {
+	while (goal != nullptr)
+	{
 		path.emplace_back(goal->grid);
 		goal = goal->parent;
 	}
 	return {path.rbegin(), path.rend()};
 }
 
-int main(int ac, char** av) {
+int main(int ac, char** av)
+{
 	auto g1 = Grid {
 		{{0, 0}, 0},
 		{{1, 0}, 2},
@@ -140,8 +146,11 @@ int main(int ac, char** av) {
 
 		{{0, 2}, 6},
 		{{1, 2}, 5},
-		{{2, 2}, 4},
+		{{2, 2}, 42},
 	};
+
+	g3.print();
+	return 0;
 
 	NPuzzle np(g3, std::make_unique<ManhattanDistance>());
 
@@ -167,7 +176,8 @@ int main(int ac, char** av) {
 		size_t steps = 0;
 		auto node = IDAStar(np, steps);
 		auto path = trace_path(node);
-		std::cout << "Steps taken:          " << steps << "\n\n";
+		std::cout << "Steps taken:          " << steps << '\n';
+		std::cout << "Path length:          " << path.size() << "\n\n";
 
 		for (const auto& grid : path) {
 			grid.print();
